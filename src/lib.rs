@@ -28,7 +28,7 @@ use std::{collections::hash_map::Entry, time::Instant};
 fn solve_clauses(
     clauses: Vec<Vec<i32>>,
     time_limit: Option<f64>,
-) -> PyResult<(Option<String>, bool)> {
+) -> PyResult<(Option<Vec<i32>>, bool)> {
     let mut instance = SatInstance::new();
     let mut lit_map = HashMap::new();
 
@@ -74,19 +74,19 @@ fn solve_clauses(
     Ok(match result {
         SolverResult::Sat => {
             let model = solver.full_solution().expect("solver state incosistent");
-            let mut solution = vec!['*'; max_var as usize + 1];
+            let mut solution = vec![];
             for var in 0..=max_var {
                 if let Some(lit) = lit_map.get(&var) {
                     let assignment = model[lit.var()];
-                    solution[var as usize] = match assignment {
-                        TernaryVal::True => '1',
-                        TernaryVal::False => '0',
-                        TernaryVal::DontCare => '*',
+                    match assignment {
+                        TernaryVal::True => solution.push(var),
+                        TernaryVal::False => solution.push(-var),
+                        TernaryVal::DontCare => {}
                     }
                 }
             }
 
-            (Some(String::from_iter(solution)), false)
+            (Some(solution), false)
         }
         SolverResult::Unsat => (None, false),
         SolverResult::Interrupted => (None, true),
