@@ -1,9 +1,9 @@
-# Small kissat wrapper for python
+# A small kissat wrapper for python
 
 To build install `maturin`, `rust`, and `libclang`. Run
 
 ```shell
-$ maturin build
+$ maturin build [--release]
 ```
 
 Install the wheel from `target/wheels` using `pip`
